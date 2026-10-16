@@ -1,0 +1,53 @@
+@model List<AccessRequest>
+@{
+    ViewData["Title"] = "All Requests (Auditor)";
+}
+
+<h1 class="h4 mb-3">All Requests</h1>
+<div class="alert alert-secondary small">
+    Anda melihat halaman ini sebagai Admin/Auditor. Auditor dapat melihat semua request
+    dan audit trail, tetapi bukan approver: tombol approve/reject tidak ditampilkan dan
+    aksi tersebut ditolak server.
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">Belum ada request sama sekali.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Requester</th>
+                    <th>Application</th>
+                    <th>Environment</th>
+                    <th>Access</th>
+                    <th>Status</th>
+                    <th>Policy</th>
+                    <th>Diajukan</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Requester.DisplayName</td>
+                        <td>@item.Application.Name</td>
+                        <td>@item.Environment</td>
+                        <td>@item.AccessLevel</td>
+                        <td><partial name="_StatusBadge" model="item.Status" /></td>
+                        <td>@item.PolicyVersion.Code</td>
+                        <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm") UTC</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-primary"
+                               asp-action="Details" asp-route-id="@item.Id">Detail</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

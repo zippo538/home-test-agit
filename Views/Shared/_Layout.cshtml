@@ -1,9 +1,15 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims
+@{
+    var user = User;
+    var isAuthenticated = user?.Identity?.IsAuthenticated == true;
+    var displayName = user?.FindFirstValue(ClaimTypes.Name);
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - home_test_agit</title>
+    <title>@ViewData["Title"] - Access Request Hub</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -13,18 +19,41 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">home_test_agit</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                <a class="navbar-brand" asp-controller="Requests" asp-action="Index">Access Request Hub</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
+                        @if (isAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Requests" asp-action="Index">My Requests</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Approvals" asp-action="Index">Approvals</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Requests" asp-action="All">All Requests</a>
+                            </li>
+                        }
+                    </ul>
+                    <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <span class="navbar-text me-3">
+                                @if (isAuthenticated)
+                                {
+                                    <text>Aktif sebagai <strong>@displayName</strong></text>
+                                }
+                                else
+                                {
+                                    <text>Belum login</text>
+                                }
+                            </span>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-controller="Account" asp-action="Switch">Ganti User</a>
                         </li>
                     </ul>
                 </div>
@@ -39,7 +68,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2026 - home_test_agit - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2026 - Access Request Hub
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

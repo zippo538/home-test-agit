@@ -1,0 +1,149 @@
+@model RequestDetailViewModel
+@{
+    ViewData["Title"] = "Detail Request";
+    var r = Model.Request;
+    var flash = TempData["Flash"] as string;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">Detail Request</h1>
+    <a class="btn btn-outline-secondary btn-sm" asp-action="Index">Kembali</a>
+</div>
+
+@if (!string.IsNullOrEmpty(flash))
+{
+    <div class="alert alert-success">@flash</div>
+}
+
+@* Conflict state (409) ditampilkan sebagai banner dengan kode, bukan stack trace (AC-20). *@
+@if (!string.IsNullOrEmpty(Model.ConflictMessage))
+{
+    <div class="alert alert-warning d-flex justify-content-between align-items-start">
+        <div>
+            <strong>Konflik (@Model.ConflictCode).</strong> @Model.ConflictMessage
+        </div>
+        <a class="btn btn-sm btn-outline-dark ms-3" asp-action="Details" asp-route-id="@r.Id">Muat ulang</a>
+    </div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>@r.Application.Name — @r.Environment / @r.AccessLevel</span>
+                <span>
+                    <partial name="_StatusBadge" model="r.Status" />
+                    @if (r.IsHighRisk)
+                    {
+                        <span class="badge bg-danger">High-risk</span>
+                    }
+                </span>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Requester</dt>
+                    <dd class="col-sm-8">@r.Requester.DisplayName</dd>
+
+                    <dt class="col-sm-4">Application</dt>
+                    <dd class="col-sm-8">@r.Application.Name (owner: @r.Application.SystemOwner.DisplayName)</dd>
+
+                    <dt class="col-sm-4">Environment</dt>
+                    <dd class="col-sm-8">@r.Environment</dd>
+
+                    <dt class="col-sm-4">Access Level</dt>
+                    <dd class="col-sm-8">@r.AccessLevel</dd>
+
+                    <dt class="col-sm-4">Justification</dt>
+                    <dd class="col-sm-8" style="white-space: pre-wrap">@r.Justification</dd>
+
+                    @if (!string.IsNullOrEmpty(r.RejectReason))
+                    {
+                        <dt class="col-sm-4">Reject Reason</dt>
+                        <dd class="col-sm-8 text-danger" style="white-space: pre-wrap">@r.RejectReason</dd>
+                    }
+
+                    <dt class="col-sm-4">Policy Version</dt>
+                    <dd class="col-sm-8">@r.PolicyVersion.Code</dd>
+
+                    <dt class="col-sm-4">Version</dt>
+                    <dd class="col-sm-8">@r.Version</dd>
+
+                    <dt class="col-sm-4">Diajukan</dt>
+                    <dd class="col-sm-8">@r.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss") UTC</dd>
+
+                    <dt class="col-sm-4">Terakhir diubah</dt>
+                    <dd class="col-sm-8">@r.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss") UTC</dd>
+                </dl>
+            </div>
+        </div>
+
+        @if (Model.CanAct)
+        {
+            <div class="card mt-3">
+                <div class="card-header">Tindakan Anda</div>
+                <div class="card-body">
+                    @* Version dikirim sebagai token concurrency: aksi basi ditolak 409 (AC-06). *@
+                    <form method="post" asp-action="Approve" class="mb-3">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@r.Id" />
+                        <input type="hidden" name="version" value="@r.Version" />
+                        <button type="submit" class="btn btn-success">Approve</button>
+                    </form>
+
+                    <form method="post" asp-action="Reject">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@r.Id" />
+                        <input type="hidden" name="version" value="@r.Version" />
+                        <div class="mb-2">
+                            <label for="reason" class="form-label">Reason <span class="text-danger">*</span></label>
+                            <textarea id="reason" name="reason" class="form-control" rows="2" required
+                                      placeholder="Alasan penolakan (wajib)."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-outline-danger">Reject</button>
+                    </form>
+                </div>
+            </div>
+        }
+        else if (!r.Status.IsTerminal())
+        {
+            <div class="alert alert-secondary mt-3 small">
+                Request ini sedang menunggu approver lain, atau Anda bukan approver untuk tahap ini.
+            </div>
+        }
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header">Audit Trail</div>
+            <div class="card-body">
+                @if (r.AuditEvents.Count == 0)
+                {
+                    <p class="text-muted mb-0">Belum ada audit event.</p>
+                }
+                else
+                {
+                    <ol class="list-unstyled mb-0">
+                        @foreach (var e in r.AuditEvents.OrderBy(a => a.OccurredAt).ThenBy(a => a.Id))
+                        {
+                            <li class="border-start ps-3 pb-3">
+                                <div class="fw-semibold">@e.Action</div>
+                                <div class="small text-muted">
+                                    @e.Actor.DisplayName —
+                                    @(e.FromStatus is null ? "—" : e.FromStatus.ToString())
+                                    → @e.ToStatus
+                                </div>
+                                <div class="small text-muted">
+                                    @e.OccurredAt.ToString("yyyy-MM-dd HH:mm:ss") UTC · v@e.RequestVersion · policy @e.PolicyVersionCode
+                                </div>
+                                @if (!string.IsNullOrEmpty(e.Reason))
+                                {
+                                    <div class="small text-danger" style="white-space: pre-wrap">@e.Reason</div>
+                                }
+                            </li>
+                        }
+                    </ol>
+                }
+            </div>
+        </div>
+    </div>
+</div>

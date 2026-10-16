@@ -1,0 +1,11 @@
+@{
+    ViewData["Title"] = "Forbidden";
+    var statusCode = ViewData["StatusCode"] as int? ?? 403;
+}
+<h1 class="text-danger">@statusCode Forbidden</h1>
+<p>@(ViewData["Message"] as string ?? "Anda tidak berhak melakukan aksi ini.")</p>
+<div class="alert alert-secondary">
+    Halaman ini ditolak oleh server. Menyembunyikan tombol di UI bukan pengaman, jadi
+    otorisasi selalu diperiksa ulang di backend.
+</div>
+<a class="btn btn-outline-secondary btn-sm" asp-controller="Requests" asp-action="Index">Kembali ke My Requests</a>

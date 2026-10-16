@@ -1,0 +1,11 @@
+@{
+    ViewData["Title"] = "Not Found";
+    var statusCode = ViewData["StatusCode"] as int? ?? 404;
+}
+<h1 class="text-danger">@statusCode Not Found</h1>
+<p>@(ViewData["Message"] as string ?? "Data yang Anda cari tidak ditemukan.")</p>
+<div class="alert alert-secondary">
+    Request yang tidak ada dan request yang bukan milik Anda sama-sama menghasilkan 404,
+    supaya keberadaan data tidak bocor.
+</div>
+<a class="btn btn-outline-secondary btn-sm" asp-controller="Requests" asp-action="Index">Kembali ke My Requests</a>
