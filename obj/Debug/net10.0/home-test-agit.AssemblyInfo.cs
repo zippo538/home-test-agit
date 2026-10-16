@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("home-test-agit")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+12062720012a7f2049c9c017ea163ae70bb58b8d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+38b31fdc602d70348515409fae7158b93b8142c1")]
 [assembly: System.Reflection.AssemblyProductAttribute("home-test-agit")]
 [assembly: System.Reflection.AssemblyTitleAttribute("home-test-agit")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
