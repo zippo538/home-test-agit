@@ -100,14 +100,23 @@ public class RequestsController : Controller
 
             return await ReRenderCreateAsync(model, StatusCodes.Status400BadRequest, ct);
         }
+        catch (ConflictException ex)
+        {
+            _logger.LogWarning("Create conflict {Code} for user {ActorId}", ex.Code, ActorId);
+            return await ReRenderCreateAsync(model, StatusCodes.Status409Conflict, ct, ex.Code, ex.Message);
+        }
     }
 
-    private async Task<IActionResult> ReRenderCreateAsync(CreateRequestViewModel model, int statusCode, CancellationToken ct)
+    private async Task<IActionResult> ReRenderCreateAsync(
+        CreateRequestViewModel model, int statusCode, CancellationToken ct,
+        string? conflictCode = null, string? conflictMessage = null)
     {
         var actor = await _users.GetByIdAsync(ActorId, ct);
         model.Applications = await _masterData.ListApplicationsAsync(ct);
         model.CanCreate = actor?.ManagerId is not null;
         Response.StatusCode = statusCode;
+        ViewData["ConflictCode"] = conflictCode;
+        ViewData["ConflictMessage"] = conflictMessage;
         return View(model);
     }
 

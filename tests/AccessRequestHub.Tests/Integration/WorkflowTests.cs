@@ -93,7 +93,7 @@ public class WorkflowTests : IntegrationTest
         var id = await CreateRequestAsync(As(Alice), CrmAppId, TargetEnvironment.NonProduction, AccessLevel.Read);
 
         var bobInbox = await As(Bob).GetStringAsync("/Approvals");
-        Assert.Contains("alice@example.local".Replace("@example.local", ""), bobInbox); // "Alice"
+        Assert.Contains("Alice", bobInbox);
 
         // Carol bukan manager Alice dan belum gilirannya: inbox kosong.
         var carolInbox = await As(Carol).GetStringAsync("/Approvals");

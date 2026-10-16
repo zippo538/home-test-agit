@@ -1,4 +1,3 @@
-using System.Net;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.Testing;
 
@@ -11,7 +10,6 @@ namespace AccessRequestHub.Tests.Infrastructure;
 public sealed partial class HubClient
 {
     private readonly HttpClient _http;
-    private string? _token;
 
     private HubClient(HttpClient http, string email)
     {
@@ -25,29 +23,25 @@ public sealed partial class HubClient
     {
         var http = factory.CreateClient(new WebApplicationFactoryClientOptions
         {
-            AllowAutoRedirect = false,   // redirect dicek eksplisit di test
+            AllowAutoRedirect = false,
             HandleCookies = true
         });
         http.DefaultRequestHeaders.Add("X-Demo-User", email);
         return new HubClient(http, email);
     }
 
-    public string EmailLocalPart => Email.Split('@')[0];
-
     public Task<HttpResponseMessage> GetAsync(string url) => _http.GetAsync(url);
 
     public async Task<string> GetStringAsync(string url)
         => await (await _http.GetAsync(url)).Content.ReadAsStringAsync();
 
-    /// <summary>POST form dengan antiforgery token yang diambil dari halaman berisi form.</summary>
     public async Task<HttpResponseMessage> PostFormAsync(
         string url, IDictionary<string, string> fields, string tokenPageUrl)
     {
-        _token ??= await FetchTokenAsync(tokenPageUrl);
-
+        var token = await FetchTokenAsync(tokenPageUrl);
         var payload = new Dictionary<string, string>(fields)
         {
-            ["__RequestVerificationToken"] = _token
+            ["__RequestVerificationToken"] = token
         };
 
         return await _http.PostAsync(url, new FormUrlEncodedContent(payload));
@@ -56,13 +50,37 @@ public sealed partial class HubClient
     private async Task<string> FetchTokenAsync(string pageUrl)
     {
         var html = await GetStringAsync(pageUrl);
-        var match = TokenRegex().Match(html);
+        var token = ExtractToken(html);
+        if (token is not null)
+            return token;
 
-        if (!match.Success)
-            throw new InvalidOperationException($"Antiforgery token tidak ditemukan di {pageUrl}.");
-
-        return match.Groups["value"].Value;
+        // Some actors cannot act on Details or create requests, so their page has no form.
+        html = await GetStringAsync("/Account/Switch");
+        token = ExtractToken(html);
+        return token ?? throw new InvalidOperationException(
+            $"Antiforgery token tidak ditemukan di {pageUrl} atau /Account/Switch. Response: {html[..Math.Min(html.Length, 400)]}");
     }
+
+    private static string? ExtractToken(string html)
+    {
+        foreach (Match tag in InputTagRegex().Matches(html))
+        {
+            if (!tag.Value.Contains("__RequestVerificationToken", StringComparison.Ordinal))
+                continue;
+
+            var value = InputValueRegex().Match(tag.Value);
+            if (value.Success)
+                return value.Groups["value"].Value;
+        }
+
+        return null;
+    }
+
+    [GeneratedRegex("<input\\b[^>]*>", RegexOptions.IgnoreCase)]
+    private static partial Regex InputTagRegex();
+
+    [GeneratedRegex("\\bvalue=[\\\"'](?<value>[^\\\"']+)[\\\"']", RegexOptions.IgnoreCase)]
+    private static partial Regex InputValueRegex();
 
     /// <summary>Mengambil ID request dari Location header setelah redirect sukses.</summary>
     public static Guid RequestIdFrom(HttpResponseMessage response)
@@ -75,9 +93,6 @@ public sealed partial class HubClient
             ? Guid.Parse(match.Value)
             : throw new InvalidOperationException($"Tidak ada Guid di Location: {location}");
     }
-
-    [GeneratedRegex("name=\"__RequestVerificationToken\"[^>]*value=\"(?<value>[^\"]+)\"")]
-    private static partial Regex TokenRegex();
 
     [GeneratedRegex(@"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")]
     private static partial Regex GuidRegex();

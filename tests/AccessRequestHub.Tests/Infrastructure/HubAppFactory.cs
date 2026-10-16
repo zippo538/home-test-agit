@@ -20,7 +20,6 @@ public class HubAppFactory : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment(Environments.Development);
-
         // Arahkan ke database temporer dan aktifkan header demo khusus test (D-16).
         builder.UseSetting("ConnectionStrings:Default", $"Data Source={_dbPath};Default Timeout=30");
         builder.UseSetting("Auth:AllowHeader", "true");

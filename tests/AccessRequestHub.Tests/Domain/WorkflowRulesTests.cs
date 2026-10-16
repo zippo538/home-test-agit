@@ -64,4 +64,30 @@ public class WorkflowRulesTests
     [InlineData(RequestStatus.Rejected)]
     public void ExpectedApprover_null_pada_status_terminal(RequestStatus terminal)
         => Assert.Null(WorkflowRules.ExpectedApprover(terminal));
+
+    [Theory]
+    [InlineData(TargetEnvironment.NonProduction, AccessLevel.Read, false)]
+    [InlineData(TargetEnvironment.NonProduction, AccessLevel.Admin, true)]
+    [InlineData(TargetEnvironment.Production, AccessLevel.Read, true)]
+    [InlineData(TargetEnvironment.Production, AccessLevel.Admin, true)]
+    public void Demo_flow_berakhir_approved_dengan_jalur_sesuai_risk(
+        TargetEnvironment environment, AccessLevel accessLevel, bool expectedHighRisk)
+    {
+        var isHighRisk = RiskPolicy.IsHighRisk(environment, accessLevel);
+        Assert.Equal(expectedHighRisk, isHighRisk);
+
+        var managerApproval = WorkflowRules.Resolve(RequestStatus.PendingManager, isHighRisk, approve: true);
+        Assert.Equal(AuditAction.ManagerApproved, managerApproval.Action);
+
+        if (!isHighRisk)
+        {
+            Assert.Equal(RequestStatus.Approved, managerApproval.To);
+            return;
+        }
+
+        Assert.Equal(RequestStatus.PendingSystemOwner, managerApproval.To);
+        var ownerApproval = WorkflowRules.Resolve(managerApproval.To, isHighRisk, approve: true);
+        Assert.Equal(AuditAction.SystemOwnerApproved, ownerApproval.Action);
+        Assert.Equal(RequestStatus.Approved, ownerApproval.To);
+    }
 }

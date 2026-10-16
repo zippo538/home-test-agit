@@ -47,7 +47,7 @@ public class AuthorizationTests : IntegrationTest
         var response = await ApproveAsync(As(Carol), id, version: 1);
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
-        Assert.Contains("PendingSystemOwner", await response.Content.ReadAsStringAsync());
+        Assert.Contains("not_your_stage", await response.Content.ReadAsStringAsync());
         Assert.Equal("PendingManager", await StatusOfAsync(id));
     }
 
