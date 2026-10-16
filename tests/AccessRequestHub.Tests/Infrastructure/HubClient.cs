@@ -41,16 +41,16 @@ public sealed partial class HubClient
 
     /// <summary>POST form dengan antiforgery token yang diambil dari halaman berisi form.</summary>
     public async Task<HttpResponseMessage> PostFormAsync(
-        string url, IDictionary<string, string?> fields, string tokenPageUrl)
+        string url, IDictionary<string, string> fields, string tokenPageUrl)
     {
         _token ??= await FetchTokenAsync(tokenPageUrl);
 
-        var payload = new Dictionary<string, string?>(fields)
+        var payload = new Dictionary<string, string>(fields)
         {
             ["__RequestVerificationToken"] = _token
         };
 
-        return await _http.PostAsync(url, new FormUrlEncodedContent(payload!));
+        return await _http.PostAsync(url, new FormUrlEncodedContent(payload));
     }
 
     private async Task<string> FetchTokenAsync(string pageUrl)
@@ -76,7 +76,7 @@ public sealed partial class HubClient
             : throw new InvalidOperationException($"Tidak ada Guid di Location: {location}");
     }
 
-    [GeneratedRegex("""name="__RequestVerificationToken"[^>]*value="(?<value>[^"]+)"""")]
+    [GeneratedRegex("name=\"__RequestVerificationToken\"[^>]*value=\"(?<value>[^\"]+)\"")]
     private static partial Regex TokenRegex();
 
     [GeneratedRegex(@"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")]

@@ -65,30 +65,44 @@ public abstract class IntegrationTest : IAsyncLifetime
         TargetEnvironment environment = TargetEnvironment.NonProduction,
         AccessLevel accessLevel = AccessLevel.Read,
         string justification = "Need access for daily duties",
-        Guid? clientRequestId = null)
+        Guid? clientRequestId = null,
+        IDictionary<string, string>? extraFields = null)
     {
-        var response = await requester.PostFormAsync("/Requests/Create", new Dictionary<string, string?>
+        var fields = new Dictionary<string, string>
         {
             ["ClientRequestId"] = (clientRequestId ?? Guid.NewGuid()).ToString(),
             ["ApplicationId"] = applicationId.ToString(),
             ["Environment"] = environment.ToString(),
             ["AccessLevel"] = accessLevel.ToString(),
             ["Justification"] = justification
-        }, tokenPageUrl: "/Requests/Create");
+        };
+
+        if (extraFields is not null)
+            foreach (var (key, value) in extraFields)
+                fields[key] = value;
+
+        var response = await requester.PostFormAsync("/Requests/Create", fields, tokenPageUrl: "/Requests/Create");
 
         Assert.Equal(System.Net.HttpStatusCode.Redirect, response.StatusCode);
         return HubClient.RequestIdFrom(response);
     }
 
+    /// <summary>POST create tanpa memeriksa hasil, untuk kasus yang memang ditolak.</summary>
+    protected async Task<HttpResponseMessage> PostCreateAsync(
+        HubClient requester,
+        IDictionary<string, string> fields,
+        string tokenPageUrl = "/Requests/Create")
+        => await requester.PostFormAsync("/Requests/Create", fields, tokenPageUrl);
+
     protected static async Task<HttpResponseMessage> ApproveAsync(HubClient approver, Guid requestId, int version)
-        => await approver.PostFormAsync("/Requests/Approve", new Dictionary<string, string?>
+        => await approver.PostFormAsync("/Requests/Approve", new Dictionary<string, string>
         {
             ["id"] = requestId.ToString(),
             ["version"] = version.ToString()
         }, tokenPageUrl: $"/Requests/Details/{requestId}");
 
-    protected static async Task<HttpResponseMessage> RejectAsync(HubClient approver, Guid requestId, int version, string? reason)
-        => await approver.PostFormAsync("/Requests/Reject", new Dictionary<string, string?>
+    protected static async Task<HttpResponseMessage> RejectAsync(HubClient approver, Guid requestId, int version, string reason)
+        => await approver.PostFormAsync("/Requests/Reject", new Dictionary<string, string>
         {
             ["id"] = requestId.ToString(),
             ["version"] = version.ToString(),

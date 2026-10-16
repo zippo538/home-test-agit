@@ -15,4 +15,16 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.13" />
   </ItemGroup>
 
+  <!--
+    Test project berada di dalam folder ini (tests/). Default glob SDK akan ikut
+    meng-compile seluruh *.cs di bawahnya, sehingga file test dan obj/ milik test
+    harus dikeluarkan dari project web.
+  -->
+  <ItemGroup>
+    <Compile Remove="tests/**" />
+    <Content Remove="tests/**" />
+    <None Remove="tests/**" />
+    <EmbeddedResource Remove="tests/**" />
+  </ItemGroup>
+
 </Project>
