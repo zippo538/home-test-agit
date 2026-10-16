@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/tests/">
+    <Project Path="tests/AccessRequestHub.Tests/AccessRequestHub.Tests.csproj" />
+  </Folder>
+  <Project Path="home-test-agit.csproj" />
+</Solution>

@@ -1,10 +1,16 @@
 using home_test_agit.Data;
 using home_test_agit.Services;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAccessRequestHub(
     builder.Configuration.GetConnectionString("Default")!);
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+builder.Host.UseSerilog();
 
 var app = builder.Build();
 
