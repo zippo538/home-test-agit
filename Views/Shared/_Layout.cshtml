@@ -34,9 +34,12 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Approvals" asp-action="Index">Approvals</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Requests" asp-action="All">All Requests</a>
-                            </li>
+                            @if (User.HasClaim("is_auditor", "true"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Requests" asp-action="All">All Requests</a>
+                                </li>
+                            }
                         }
                     </ul>
                     <ul class="navbar-nav">

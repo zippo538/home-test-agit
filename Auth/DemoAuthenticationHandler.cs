@@ -79,6 +79,8 @@ public class DemoAuthenticationHandler : AuthenticationHandler<AuthenticationSch
             new(ClaimTypes.Name, user.DisplayName),
             new(ClaimTypes.Email, user.Email)
         };
+        if (user.IsAuditor) 
+            claims.Add(new Claim("is_auditor", "true"));
 
         var identity = new ClaimsIdentity(claims, SchemeName);
         return new AuthenticationTicket(new ClaimsPrincipal(identity), SchemeName);

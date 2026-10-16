@@ -61,10 +61,9 @@ public class AccountController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SignOutUser()
+    public  IActionResult SignOutUser()
     {
         Response.Cookies.Delete(DemoAuthenticationHandler.CookieName);
-        await HttpContext.SignOutAsync(DemoAuthenticationHandler.SchemeName);
         return RedirectToAction(nameof(Switch));
     }
 }
