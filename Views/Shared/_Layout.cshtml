@@ -1,26 +1,66 @@
 ﻿@using System.Security.Claims
+@using Microsoft.EntityFrameworkCore
+@inject home_test_agit.Repository.AppDbContext NavigationDb
 @{
-    var user = User;
-    var isAuthenticated = user?.Identity?.IsAuthenticated == true;
-    var displayName = user?.FindFirstValue("name")
-        ?? user?.FindFirstValue(ClaimTypes.Name)
-        ?? user?.Identity?.Name
-        ?? user?.FindFirstValue("email")
+    var isAuthenticated = User?.Identity?.IsAuthenticated == true;
+    var displayName = User?.FindFirstValue("name")
+        ?? User?.FindFirstValue(ClaimTypes.Name)
+        ?? User?.Identity?.Name
+        ?? User?.FindFirstValue("email")
         ?? "Pengguna";
 
-    // Admin/Auditor memiliki navigasi baca seluruh request, bukan approval.
-    var isAdmin = isAuthenticated && User.IsInRole("Admin");
-    var isManager = isAuthenticated && User.IsInRole("Manager");
-    var isSystemOwner = isAuthenticated && User.IsInRole("SystemOwner");
-    var canRequest = isAuthenticated && User.IsInRole("Requester") && !isAdmin;
-    var canApprove = (isManager || isSystemOwner) && !isAdmin;
-    var homeController = isAuthenticated ? (isAdmin ? "Requests" : (canApprove ? "Approvals" : "Requests")) : "Account";
-    var homeAction = isAuthenticated ? (isAdmin ? "All" : "Index") : "Login";
-    var roleLabel = isAdmin ? "Admin / Auditor"
-        : isManager && isSystemOwner ? "Manager / System Owner"
-        : isManager ? "Manager"
-        : isSystemOwner ? "System Owner"
-        : canRequest ? "Requester" : "Tanpa peran";
+    // Gunakan identitas domain dari hasil autentikasi, bukan email atau ID hard-coded.
+    var localUserId = User?.FindFirstValue("arh_user_id");
+    var canRequest = false;
+    var canApprove = false;
+    var isAdmin = false;
+    var isManager = false;
+    var isSystemOwner = false;
+
+    if (isAuthenticated && int.TryParse(localUserId, out var actorId))
+    {
+        // Proyeksi langsung menghindari navigation collection yang belum dimuat.
+        var actor = await NavigationDb.Users.AsNoTracking()
+            .Where(item => item.Id == actorId)
+            .Select(item => new
+            {
+                item.DisplayName,
+                item.ManagerId,
+                item.IsAuditor,
+                IsManager = item.DirectReports.Any(),
+                IsSystemOwner = item.OwnedApplications.Any()
+            })
+            .SingleOrDefaultAsync(Context.RequestAborted);
+
+        if (actor is not null)
+        {
+            displayName = actor.DisplayName;
+            // D-11: hanya pengguna dengan atasan yang dapat membuat request.
+            canRequest = actor.ManagerId.HasValue;
+            isAdmin = actor.IsAuditor;
+            isManager = actor.IsManager;
+            isSystemOwner = actor.IsSystemOwner;
+            // Auditor bukan approver otomatis; penugasan domain menentukan kemampuan.
+            canApprove = isManager || isSystemOwner;
+        }
+    }
+
+    var roleLabels = new System.Collections.Generic.List<string>();
+    if (canRequest) roleLabels.Add("Requester");
+    if (isManager) roleLabels.Add("Manager");
+    if (isSystemOwner) roleLabels.Add("System Owner");
+    if (isAdmin) roleLabels.Add("Admin / Auditor");
+    var roleLabel = roleLabels.Count > 0
+        ? string.Join(" / ", roleLabels)
+        : "Akses belum tersedia";
+
+    var homeController = !isAuthenticated ? "Account"
+        : canApprove ? "Approvals"
+        : isAdmin || canRequest ? "Requests" : "Home";
+    var homeAction = !isAuthenticated ? "Login"
+        : canApprove ? "Index"
+        : isAdmin ? "All"
+        : canRequest ? "Index" : "Forbidden";
 }
 <!DOCTYPE html>
 <html lang="id">

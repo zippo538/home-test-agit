@@ -1,6 +1,5 @@
 using home_test_agit.Models;
 using home_test_agit.Repository;
-using Microsoft.Extensions.Logging;
 
 namespace home_test_agit.Services;
 
