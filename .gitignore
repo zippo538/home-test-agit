@@ -9,6 +9,7 @@ accessrequesthub.identity.db*
 .env
 .omc/
 .claude/
+accessrequesthub.db-*
 
 bin/
 obj/
