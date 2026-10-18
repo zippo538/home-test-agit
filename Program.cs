@@ -5,7 +5,8 @@ using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAccessRequestHub(
-    builder.Configuration.GetConnectionString("Default")!);
+    builder.Configuration.GetConnectionString("Default")!,
+    builder.Configuration);
 
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)

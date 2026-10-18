@@ -1,29 +1,23 @@
-@model SwitchUserViewModel
 @{
-    ViewData["Title"] = "Pilih User";
+    ViewData["Title"] = "Login";
 }
 
-<h1 class="h4 mb-3">Pilih User (login simulasi)</h1>
-<p class="text-muted">
-    Phase 1 tidak memakai SSO. Pilih salah satu demo user untuk melanjutkan.
-</p>
-
-<div class="row g-3">
-    @foreach (var user in Model.Users)
-    {
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-body d-flex flex-column">
-                    <h2 class="h6 card-title mb-1">@user.DisplayName</h2>
-                    <p class="text-muted small mb-3">@user.Email</p>
-                    <form method="post" asp-action="Switch" class="mt-auto">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="userId" value="@user.Id" />
-                        <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
-                        <button type="submit" class="btn btn-primary btn-sm">Masuk sebagai @user.DisplayName</button>
-                    </form>
+<div class="row justify-content-center py-5">
+    <div class="col-sm-10 col-md-7 col-lg-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px;">
+                        <span class="fs-4 fw-bold">A</span>
+                    </div>
+                    <h1 class="h3 mb-2">Access Request Hub</h1>
+                    <p class="text-secondary mb-0">Masuk dengan akun organisasi Anda</p>
                 </div>
+                <a class="btn btn-primary btn-lg w-100" asp-controller="Account" asp-action="Sso" asp-route-returnUrl="@Context.Request.Query["returnUrl"]">
+                    Lanjutkan dengan Single Sign-On
+                </a>
+                <p class="small text-secondary text-center mt-4 mb-0">Autentikasi dikelola secara aman oleh IdentityServer.</p>
             </div>
         </div>
-    }
+    </div>
 </div>

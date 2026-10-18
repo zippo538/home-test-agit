@@ -1,13 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>home_test_agit</RootNamespace>
+    <UserSecretsId>895873b0-cd1a-4225-afe3-159d313fcc15</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -22,10 +25,10 @@
     harus dikeluarkan dari project web.
   -->
   <ItemGroup>
-    <Compile Remove="tests/**" />
-    <Content Remove="tests/**" />
-    <None Remove="tests/**" />
-    <EmbeddedResource Remove="tests/**" />
+    <Compile Remove="tests/**;AccessRequestHub.Tests/**;AccessRequestHub.IdentityServer/**/*.cs;AccessRequestHub.IdentityServer/obj/**;AccessRequestHub.IdentityServer/bin/**" />
+    <Content Remove="tests/**;AccessRequestHub.Tests/**;AccessRequestHub.IdentityServer/**/*" />
+    <None Remove="tests/**;AccessRequestHub.Tests/**;AccessRequestHub.IdentityServer/**/*" />
+    <EmbeddedResource Remove="tests/**;AccessRequestHub.Tests/**;AccessRequestHub.IdentityServer/**/*" />
   </ItemGroup>
 
 </Project>

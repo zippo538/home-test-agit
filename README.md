@@ -3,7 +3,7 @@
 MVP untuk memusatkan permintaan akses aplikasi internal: request, approval bertingkat,
 idempotency, optimistic concurrency, dan audit trail append-only.
 
-Stack: **ASP.NET Core MVC (.NET 10)** · **EF Core + LINQ** · **SQLite** · **Razor Views + Bootstrap 5**
+Stack: **ASP.NET Core MVC (.NET 10)** · **Duende IdentityServer 8** · **ASP.NET Core Identity** · **EF Core + SQLite** · **Razor + Bootstrap**
 
 > Catatan: dokumen task menyebut "Blade". Blade adalah template engine Laravel (PHP) dan tidak
 > dapat dipakai bersama LINQ/.NET. Padanannya di .NET adalah **Razor**, sehingga frontend memakai
@@ -29,29 +29,30 @@ dotnet --version
 
 ## 2. Menjalankan program
 
-Dari root repository:
+Dari root repository, restore, build, dan test:
 
 ```bash
 dotnet restore
 dotnet build
-dotnet run
+dotnet test tests/AccessRequestHub.Tests/AccessRequestHub.Tests.csproj
 ```
 
-Aplikasi berjalan di **http://localhost:5135** (profil `http` pada `Properties/launchSettings.json`).
-
-Saat startup, aplikasi otomatis:
-
-1. menjalankan migration (membuat schema + seed), dan
-2. memasang trigger append-only pada tabel audit.
-
-Buka `http://localhost:5135` — halaman pertama adalah **User Switcher**. Pilih satu demo user
-untuk mulai (tidak ada sandi; ini login simulasi Phase 1).
-
-Profil HTTPS (opsional):
+Authentication berjalan melalui dua host. Lihat bagian 9 untuk konfigurasi secrets. Jalankan
+IdentityServer dan MVC app di terminal terpisah:
 
 ```bash
-dotnet run --launch-profile https
+dotnet run --project AccessRequestHub.IdentityServer --launch-profile https
 ```
+
+```bash
+dotnet run --project home-test-agit.csproj --launch-profile https
+```
+
+Buka `https://localhost:7019`; login akan dialihkan ke Duende IdentityServer. Host HTTP lokal
+juga tersedia di `http://localhost:5149` (IdentityServer) dan `http://localhost:5135` (MVC app).
+
+Saat startup, IdentityServer menginisialisasi database business dan identity secara terpisah.
+IdentityServer memigrasikan schema workflow dan memasang trigger append-only pada audit table.
 
 ---
 
@@ -59,7 +60,7 @@ dotnet run --launch-profile https
 
 ### Lokasi
 
-File `accessrequesthub.db` dibuat di root project. Connection string ada di `appsettings.json`:
+File business `accessrequesthub.db` berada di root project. Connection string ada di `appsettings.json`. Identity credentials disimpan terpisah di `accessrequesthub.identity.db` dan tidak berisi data workflow:
 
 ```
 Data Source=accessrequesthub.db;Default Timeout=30
@@ -69,7 +70,7 @@ Data Source=accessrequesthub.db;Default Timeout=30
 
 ### Membuat / memperbarui schema
 
-Otomatis saat `dotnet run`. Secara manual:
+Schema business diinisialisasi oleh IdentityServer saat startup. Untuk migration workflow secara manual, gunakan host project yang mengandung `AppDbContext`:
 
 ```bash
 dotnet ef database update
@@ -118,11 +119,7 @@ Seed memakai ID tetap (`HasData`), jadi reproducible:
 dotnet test
 ```
 
-> **Status:** project test otomatis belum dibuat di repository ini. Perintah di atas akan
-> melaporkan bahwa tidak ada project test yang ditemukan. Rencana cakupan test (flow standard,
-> high-risk, authorization failure, idempotency, concurrency) ada di `specs/ACCEPTANCE.md`
-> bagian H dan `specs/TASKS.md` task T5. Sampai itu selesai, verifikasi dilakukan manual
-> memakai **Demo Flow** di bagian 6.
+Test suite berada di `tests/AccessRequestHub.Tests` dan mencakup workflow, otorisasi, concurrency, idempotency, audit, dan validasi.
 
 ---
 
@@ -136,7 +133,7 @@ dotnet test
 | dana@example.local | Dana | System Owner **Finance Portal** — approver tahap 2 |
 | erin@example.local | Erin | Admin/Auditor — melihat semua request + audit, **bukan approver** |
 
-Berganti user: menu **Ganti User** di navbar, atau langsung ke `/Account/Switch`.
+Akun domain di atas dipetakan ke akun ASP.NET Core Identity. Pada Development, IdentityServer hanya membuat akun yang password-nya diberikan lewat user secrets atau environment configuration (lihat bagian 9); password tidak disediakan secara default.
 
 ---
 
@@ -163,7 +160,7 @@ PendingManager ──approve (non-high-risk)──► Approved (terminal)
 1. Login **Alice** → **Ajukan Request** → Application `CRM`, Environment `NonProduction`,
    Access Level `Read`, isi Justification → **Kirim Request**.
 2. Status awal `PendingManager`.
-3. **Ganti User** ke **Bob** → menu **Approvals** → request Alice ada di inbox.
+3. **Keluar**, lalu masuk sebagai **Bob** → menu **Approvals** → request Alice ada di inbox.
 4. **Tinjau** → **Approve**.
 5. Hasil: status **`Approved`** (terminal). Audit berisi `Created` lalu `ManagerApproved`.
 
@@ -216,7 +213,9 @@ Erin tidak punya inbox approval, dan aksi approve/reject terhadap Erin ditolak *
 
 | Method | Route | Akses | Keterangan |
 |---|---|---|---|
-| GET/POST | `/Account/Switch` | Publik | User switcher (login simulasi) |
+| GET | `/Account/Login` | Publik | Landing page untuk memulai SSO |
+| GET | `/Account/Sso` | Publik | OIDC challenge ke IdentityServer |
+| POST | `/Account/Logout` | Login | Keluar dari MVC app dan IdentityServer |
 | GET | `/Requests` | Login | My Requests (milik sendiri) |
 | GET | `/Requests/All` | Auditor | Semua request (selain auditor → 403) |
 | GET/POST | `/Requests/Create` | Requester dengan atasan | Form create |
@@ -234,7 +233,7 @@ Semua POST memakai antiforgery token.
 | Kondisi | HTTP | Perilaku UI |
 |---|---|---|
 | Field wajib kosong, enum tidak valid, reject tanpa reason | **400** | Banner konflik berisi pesan validasi per-field |
-| Belum login | **302** | Diarahkan ke User Switcher |
+| Belum login | **302** | Diarahkan ke login SSO |
 | Bukan assigned approver / self-approval / bukan auditor | **403** | Halaman Forbidden |
 | Request tidak ada, atau bukan milik user | **404** | Halaman Not Found |
 | Status terminal, belum giliran, version basi, idempotency payload berbeda | **409** | Banner konflik dengan kode + tombol muat ulang |
@@ -249,22 +248,83 @@ bukan 403, supaya keberadaan data tidak bocor.
 
 ---
 
-## 9. Authentication (simulasi)
+## 9. Authentication dan secrets
 
-Tidak ada SSO/OAuth pada Phase 1. Identitas berasal dari dua sumber:
-
-1. **Cookie** `arh.demo` — diisi oleh User Switcher. Ini jalur normal saat memakai browser.
-2. **Header** `X-Demo-User: <email>` — **hanya aktif bila** `Auth:AllowHeader=true`, dan
-   default-nya `false`. Ditujukan untuk test otomatis, bukan untuk produksi.
-
-Mengaktifkan header secara lokal:
+MVC app menggunakan OIDC Authorization Code + PKCE dengan Duende IdentityServer. Untuk Development,
+client secret harus tersedia di user secrets pada **kedua** project, dengan nilai yang sama. Dari
+root repository:
 
 ```bash
-Auth__AllowHeader=true dotnet run
+dotnet user-secrets init --project AccessRequestHub.IdentityServer
+dotnet user-secrets set "Oidc:ClientSecret" "<strong-random-client-secret>" --project AccessRequestHub.IdentityServer
+dotnet user-secrets init --project home-test-agit.csproj
+dotnet user-secrets set "Oidc:ClientSecret" "<same-strong-random-client-secret>" --project home-test-agit.csproj
 ```
 
-Actor pada setiap aksi selalu diambil dari principal yang terautentikasi di server, bukan dari
-payload form. Otorisasi ditegakkan di service layer; menyembunyikan tombol di UI bukan pengaman.
+Tambahkan password sementara yang unik untuk setiap akun demo ke user secrets IdentityServer
+(gunakan email yang tercantum di bagian 5):
+
+```bash
+dotnet user-secrets set "DevelopmentAccounts:Passwords:alice@example.local" "<strong-temporary-password>" --project AccessRequestHub.IdentityServer
+```
+
+Ulangi untuk setiap akun yang perlu diuji. Seeder hanya aktif pada Development dan tidak membuat
+atau mengubah password tanpa nilai konfigurasi eksplisit. Jangan commit password, client secret,
+signing key, atau Duende license. Untuk HTTPS lokal, trust development certificate bila diperlukan:
+
+```bash
+dotnet dev-certs https --trust
+```
+
+Header `X-Demo-User` hanya didukung oleh authentication handler test ketika `Auth:AllowHeader=true`;
+jangan aktifkan di production. Actor untuk setiap aksi diambil dari principal server-side, bukan
+dari payload form. Otorisasi workflow tetap ditegakkan di service layer.
+
+### Sign in dengan Microsoft (opsional, personal account)
+
+Halaman login IdentityServer bisa menampilkan tombol **Masuk dengan Microsoft** bila provider
+Microsoft dikonfigurasi. Tombol hanya muncul bila `Microsoft:ClientId` dan `Microsoft:ClientSecret`
+tersedia; tanpa konfigurasi itu, login lokal (email + password) tetap berfungsi seperti biasa.
+
+Siapkan app registration Microsoft personal (consumers) di portal Azure/microsoft:
+
+1. Buat **App registration** dengan tipe akun *Personal Microsoft accounts only*.
+2. Catat **Application (client) ID**.
+3. Tambahkan **Client secret** (bisa Secret description bebas; catat nilainya).
+4. Di **Authentication**, tambahkan Web redirect URI: `http://localhost:5149/signin-microsoft`
+   (sesuaikan host/port bila memakai profil lain).
+
+Lalu set di user secrets IdentityServer:
+
+```bash
+dotnet user-secrets set "Microsoft:ClientId" "<application-client-id>" --project AccessRequestHub.IdentityServer
+dotnet user-secrets set "Microsoft:ClientSecret" "<client-secret-value>" --project AccessRequestHub.IdentityServer
+```
+
+Setelah login Microsoft pertama pada suatu akun, halaman **ExternalSubject** menampilkan subject
+(`sub`) akun itu. Operator menautkannya secara eksplisit ke satu pengguna domain dengan menambahkan
+mapping berikut lalu me-restart IdentityServer:
+
+```bash
+dotnet user-secrets set "Microsoft:ApprovedSubjects:<subject>" "<domain-user-id>" --project AccessRequestHub.IdentityServer
+```
+
+`<domain-user-id>` adalah ID numerik pengguna domain (misalnya `1` untuk Alice, `2` untuk Bob,
+`3` untuk Carol, `4` untuk Dana, `5` untuk Erin). Setelah mapping terpasang, login Microsoft
+berikutnya akan masuk sebagai pengguna domain tersebut, dan role (`Requester`, `Manager`,
+`SystemOwner`, `Admin`) diambil dari data domain seperti biasa.
+
+**Catatan penting:** satu akun Microsoft hanya bisa tertaut ke **satu** pengguna domain.
+Alias Outlook seperti `mahindra+alice@outlook.com` dan `mahindra+bob@outlook.com` adalah akun
+Microsoft yang sama (subject identik), sehingga keduanya akan masuk sebagai pengguna domain
+yang sama. Untuk menguji beberapa role dengan SSO Microsoft, gunakan akun Microsoft yang
+benar-benar berbeda (registrasi terpisah), atau gunakan akun demo lokal (email + password)
+untuk role lainnya. Pencocokan email Microsoft tidak dipakai untuk menautkan akun; hanya
+mapping eksplisit oleh operator yang berlaku, dan tanpa mapping akun akan ditolak.
+
+IdentityServer Development tidak memerlukan production license. Deployment non-Development membutuhkan
+`Duende:LicenseKey`, signing key material, client secret, dan redirect URI HTTPS yang sesuai dari
+secure configuration. Patuhi persyaratan lisensi Duende.
 
 ---
 
@@ -300,9 +360,7 @@ dan memetakan hasil ke HTTP status.
   membocorkan keberadaan request.
 - **SQLite single-writer**: penulisan konkuren di-serialize. Optimistic concurrency tetap bekerja,
   tetapi ini bukan uji throughput.
-- **Belum ada automated test project** (lihat bagian 4).
-- Dokumentasi deliverable lain (`PLAN.md`, `AI_USAGE.md`, `REVIEW.md`, `INTEGRITY.md`) belum
-  tersedia di root repository.
+- Signing key persistence, production-grade Identity database migration/deployment, serta production provisioning perlu dikonfigurasi sesuai environment sebelum deployment.
 
 ---
 

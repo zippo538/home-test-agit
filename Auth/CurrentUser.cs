@@ -21,7 +21,9 @@ public class CurrentUser : ICurrentUser
     {
         get
         {
-            var raw = _accessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var principal = _accessor.HttpContext?.User;
+            var raw = principal?.FindFirstValue("arh_user_id")
+                ?? principal?.FindFirstValue(ClaimTypes.NameIdentifier);
             return int.TryParse(raw, out var id) ? id : null;
         }
     }

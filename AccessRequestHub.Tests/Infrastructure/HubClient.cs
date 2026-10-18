@@ -55,7 +55,7 @@ public sealed partial class HubClient
             return token;
 
         // Some actors cannot act on Details or create requests, so their page has no form.
-        html = await GetStringAsync("/Account/Switch");
+        html = await GetStringAsync("/Account/Login");
         token = ExtractToken(html);
         return token ?? throw new InvalidOperationException(
             $"Antiforgery token tidak ditemukan di {pageUrl} atau /Account/Switch. Response: {html[..Math.Min(html.Length, 400)]}");

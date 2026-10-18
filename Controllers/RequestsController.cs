@@ -41,6 +41,7 @@ public class RequestsController : Controller
 
     /// <summary>Semua request untuk Auditor (AC-18); service melempar 403 bagi yang lain.</summary>
     [HttpGet]
+    [Authorize(Policy = "AdminOnly")]
     public async Task<IActionResult> All(CancellationToken ct)
         => View(await _service.GetAllAsync(ActorId, ct));
 

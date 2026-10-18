@@ -67,7 +67,7 @@ public class DemoAuthenticationHandler : AuthenticationHandler<AuthenticationSch
         }
 
         var returnUrl = Uri.EscapeDataString(Request.Path + Request.QueryString);
-        Response.Redirect($"/Account/Switch?returnUrl={returnUrl}");
+        Response.Redirect($"/Account/Login?returnUrl={returnUrl}");
         return Task.CompletedTask;
     }
 
@@ -79,8 +79,16 @@ public class DemoAuthenticationHandler : AuthenticationHandler<AuthenticationSch
             new(ClaimTypes.Name, user.DisplayName),
             new(ClaimTypes.Email, user.Email)
         };
-        if (user.IsAuditor) 
+        claims.Add(new Claim(ClaimTypes.Role, "Requester"));
+        if (user.Id == 2)
+            claims.Add(new Claim(ClaimTypes.Role, "Manager"));
+        if (user.Id is 3 or 4)
+            claims.Add(new Claim(ClaimTypes.Role, "SystemOwner"));
+        if (user.IsAuditor)
+        {
             claims.Add(new Claim("is_auditor", "true"));
+            claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+        }
 
         var identity = new ClaimsIdentity(claims, SchemeName);
         return new AuthenticationTicket(new ClaimsPrincipal(identity), SchemeName);
