@@ -13,7 +13,8 @@ public sealed class AccountController(
     UserManager<IdentityUserAccount> userManager,
     IIdentityServerInteractionService interaction,
     MicrosoftExternalLoginLinker linker,
-    IAuthenticationSchemeProvider schemes) : Controller
+    IAuthenticationSchemeProvider schemes,
+    ILogger<AccountController> logger) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Login(string? returnUrl)
@@ -81,7 +82,12 @@ public sealed class AccountController(
         var subject = MicrosoftExternalLoginLinker.ExtractSubject(info.Principal)
             ?? info.ProviderKey;
         var resolution = await linker.ResolveAsync(subject ?? string.Empty, HttpContext.RequestAborted);
-
+        logger.LogInformation(
+            "Microsoft callback: Outcome={Outcome}, DomainUserId={DomainUserId}, ReturnUrlValid={ReturnUrlValid}",
+            resolution.Outcome,
+            resolution.Account?.DomainUserId,
+            !string.IsNullOrWhiteSpace(returnUrl)
+            && interaction.IsValidReturnUrl(returnUrl));
         switch (resolution.Outcome)
         {
             case ExternalLoginOutcome.Success when resolution.Account is not null:

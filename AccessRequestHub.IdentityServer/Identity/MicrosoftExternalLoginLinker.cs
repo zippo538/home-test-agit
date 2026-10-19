@@ -27,7 +27,8 @@ public sealed class MicrosoftExternalLoginLinker(
     UserManager<IdentityUserAccount> userManager,
     AppDbContext hubDb,
     IConfiguration configuration,
-    IWebHostEnvironment environment)
+    IWebHostEnvironment environment,
+    ILogger<MicrosoftExternalLoginLinker> logger)
 {
     public const string SchemeName = "Microsoft";
     public const string LoginProvider = "Microsoft";
@@ -50,6 +51,10 @@ public sealed class MicrosoftExternalLoginLinker(
         var loginKey = new UserLoginInfo(LoginProvider, subject, LoginProvider);
         var existingAccount = await userManager.FindByLoginAsync(loginKey.LoginProvider, loginKey.ProviderKey);
         var configuredDomainUserId = configuration[$"Microsoft:ApprovedSubjects:{subject}"];
+        logger.LogInformation(
+            "Microsoft mapping: ConfiguredDomainUserId={ConfiguredId}, ExistingDomainUserId={ExistingId}",
+            configuredDomainUserId,
+            existingAccount?.DomainUserId);
 
         if (existingAccount is not null)
         {
@@ -71,11 +76,19 @@ public sealed class MicrosoftExternalLoginLinker(
 
         var domainUserExists = await hubDb.Users.AsNoTracking()
             .AnyAsync(user => user.Id == domainUserId, ct);
+        logger.LogInformation(
+            "Microsoft mapping: DomainUserExists={Exists}",
+            domainUserExists);
         if (!domainUserExists)
             return new ExternalLoginResolution(ExternalLoginOutcome.Failure, null, subject);
 
+
+
         var account = await userManager.Users
             .SingleOrDefaultAsync(user => user.DomainUserId == domainUserId, ct);
+        logger.LogInformation(
+            "Microsoft mapping: IdentityAccountExists={Exists}",
+            account is not null);
         if (account is null)
             return new ExternalLoginResolution(ExternalLoginOutcome.Failure, null, subject);
 
@@ -86,7 +99,16 @@ public sealed class MicrosoftExternalLoginLinker(
 
         var addResult = await userManager.AddLoginAsync(account, loginKey);
         if (!addResult.Succeeded)
-            return new ExternalLoginResolution(ExternalLoginOutcome.Failure, null, subject);
+        {
+            foreach (var error in addResult.Errors)
+            {
+                logger.LogWarning(
+                    "Microsoft mapping: AddLogin failed, Code={Code}",
+                    error.Code);
+            }
+            return new ExternalLoginResolution(
+                ExternalLoginOutcome.Failure, null, subject);
+        }
 
         return new ExternalLoginResolution(ExternalLoginOutcome.Success, account, subject);
     }

@@ -5,8 +5,14 @@ using home_test_agit.Data;
 using home_test_agit.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+builder.Host.UseSerilog();
 
 var identityConnection = builder.Configuration.GetConnectionString("Identity")
     ?? throw new InvalidOperationException("ConnectionStrings:Identity is required.");
