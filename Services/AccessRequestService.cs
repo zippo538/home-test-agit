@@ -1,4 +1,6 @@
+using home_test_agit.Domain;
 using home_test_agit.Models;
+using home_test_agit.Models.Enums;
 using home_test_agit.Repository;
 
 namespace home_test_agit.Services;

@@ -1,3 +1,5 @@
+using home_test_agit.Models.Enums;
+
 namespace home_test_agit.Models;
 
 public class PolicyVersion
@@ -8,4 +10,11 @@ public class PolicyVersion
     public string Code { get; set; } = string.Empty;
 
     public bool IsActive { get; set; }
+
+    /// <summary>
+    /// Aturan high-risk policy v1 (satu-satunya sumber routing).
+    /// High-risk = Production ATAU Admin.
+    /// </summary>
+    public bool IsHighRisk(TargetEnvironment environment, AccessLevel accessLevel)
+        => environment == TargetEnvironment.Production || accessLevel == AccessLevel.Admin;
 }

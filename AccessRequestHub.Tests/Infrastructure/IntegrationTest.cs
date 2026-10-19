@@ -1,4 +1,5 @@
 using home_test_agit.Models;
+using home_test_agit.Models.Enums;
 using home_test_agit.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

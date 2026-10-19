@@ -1,6 +1,7 @@
 using System.Net;
 using AccessRequestHub.Tests.Infrastructure;
 using home_test_agit.Models;
+using home_test_agit.Models.Enums;
 
 namespace AccessRequestHub.Tests.Integration;
 

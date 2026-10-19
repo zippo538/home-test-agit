@@ -1,3 +1,5 @@
+using home_test_agit.Models.Enums;
+
 namespace home_test_agit.Models;
 
 public class AccessRequest
@@ -79,7 +81,7 @@ public class AccessRequest
             AccessLevel = accessLevel,
             Justification = justification.Trim(),
             Status = RequestStatus.PendingManager,
-            IsHighRisk = RiskPolicy.IsHighRisk(environment, accessLevel),
+            IsHighRisk = policy.IsHighRisk(environment, accessLevel),
             PolicyVersionId = policy.Id,
             Version = 1,
             CreatedAt = utcNow,

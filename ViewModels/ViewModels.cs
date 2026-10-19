@@ -1,4 +1,7 @@
-namespace home_test_agit.Models;
+using home_test_agit.Models;
+using home_test_agit.Models.Enums;
+
+namespace home_test_agit.ViewModels;
 
 public class CreateRequestViewModel
 {

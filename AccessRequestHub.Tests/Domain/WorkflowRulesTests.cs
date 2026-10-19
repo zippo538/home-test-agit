@@ -1,4 +1,6 @@
+using home_test_agit.Domain;
 using home_test_agit.Models;
+using home_test_agit.Models.Enums;
 
 namespace AccessRequestHub.Tests.Domain;
 
@@ -73,7 +75,7 @@ public class WorkflowRulesTests
     public void Demo_flow_berakhir_approved_dengan_jalur_sesuai_risk(
         TargetEnvironment environment, AccessLevel accessLevel, bool expectedHighRisk)
     {
-        var isHighRisk = RiskPolicy.IsHighRisk(environment, accessLevel);
+        var isHighRisk = new PolicyVersion().IsHighRisk(environment, accessLevel);
         Assert.Equal(expectedHighRisk, isHighRisk);
 
         var managerApproval = WorkflowRules.Resolve(RequestStatus.PendingManager, isHighRisk, approve: true);

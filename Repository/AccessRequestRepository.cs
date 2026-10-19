@@ -1,4 +1,5 @@
 using home_test_agit.Models;
+using home_test_agit.Models.Enums;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 

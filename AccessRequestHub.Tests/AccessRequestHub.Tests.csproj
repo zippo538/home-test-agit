@@ -22,7 +22,7 @@
 
   <!-- Menguji aplikasi web yang sesungguhnya, bukan salinannya. -->
   <ItemGroup>
-    <ProjectReference Include="..\..\home-test-agit.csproj" />
+    <ProjectReference Include="../home-test-agit.csproj" />
   </ItemGroup>
 
 </Project>

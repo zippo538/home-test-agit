@@ -1,10 +1,6 @@
-namespace home_test_agit.Models;
+using home_test_agit.Models.Enums;
 
-public enum ApproverRole
-{
-    Manager,
-    SystemOwner
-}
+namespace home_test_agit.Domain;
 
 public readonly record struct Transition(AuditAction Action, RequestStatus To);
 

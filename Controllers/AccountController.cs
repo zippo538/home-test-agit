@@ -1,4 +1,5 @@
 using home_test_agit.Models;
+using home_test_agit.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;

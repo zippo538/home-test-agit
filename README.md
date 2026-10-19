@@ -334,7 +334,8 @@ secure configuration. Patuhi persyaratan lisensi Duende.
 Controllers/     Account (switcher), Requests (create/list/detail/approve/reject), Approvals (inbox)
 Auth/            DemoAuthenticationHandler, CurrentUser
 Filters/         DomainExceptionFilter (403/404 → halaman error)
-Models/          Entity, enum, RiskPolicy, WorkflowRules, ApprovalAuthorization, ViewModel
+Models/          EF entities, PolicyVersion, enum, ViewModel
+Domain/          Pure business rules: WorkflowRules, ApprovalAuthorization
 Repository/      AppDbContext, repository + interface (semua query LINQ)
 Services/        AccessRequestService (aturan bisnis), exception domain, DI extension
 Data/            DatabaseBootstrapper (migrate + trigger audit append-only)
@@ -343,8 +344,8 @@ Views/           Razor + Bootstrap (Requests, Approvals, Account, Shared)
 specs/           ACCEPTANCE, PLAN, SPEC, DECISIONS, TASKS
 ```
 
-Aturan bisnis terpusat di `Models/RiskPolicy.cs` (definisi high-risk) dan
-`Models/WorkflowRules.cs` (tabel transisi). Controller hanya membind request, memanggil service,
+Aturan bisnis terpusat di `Models/PolicyVersion.cs` (method `IsHighRisk`) dan
+`Domain/WorkflowRules.cs` (tabel transisi). Controller hanya membind request, memanggil service,
 dan memetakan hasil ke HTTP status.
 
 ---

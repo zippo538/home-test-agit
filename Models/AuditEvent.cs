@@ -1,3 +1,5 @@
+using home_test_agit.Models.Enums;
+
 namespace home_test_agit.Models;
 
 /// <summary>
