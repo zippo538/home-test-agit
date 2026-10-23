@@ -1,9 +1,15 @@
-@model CreateRequestViewModel
+@using home_test_agit.Models.Enums
+@model home_test_agit.ViewModels.CreateRequestViewModel
 @{
     ViewData["Title"] = "Ajukan Request";
 }
 
 <h1 class="h4 mb-3">Ajukan Request Akses</h1>
+
+@if (ViewData["ConflictMessage"] is string conflictMessage)
+{
+    <div class="alert alert-warning" data-conflict-code="@ViewData["ConflictCode"]">@conflictMessage</div>
+}
 
 @if (!Model.CanCreate)
 {

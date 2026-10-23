@@ -1,7 +1,9 @@
 using home_test_agit.Auth;
+using home_test_agit.Domain;
 using home_test_agit.Models;
 using home_test_agit.Repository;
 using home_test_agit.Services;
+using home_test_agit.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,10 +41,26 @@ public class RequestsController : Controller
     public async Task<IActionResult> Index(CancellationToken ct)
         => View(await _service.GetMyRequestsAsync(ActorId, ct));
 
-    /// <summary>Semua request untuk Auditor (AC-18); service melempar 403 bagi yang lain.</summary>
+    /// <summary>Semua request untuk Auditor (AC-18), berdasarkan data domain terkini.</summary>
     [HttpGet]
     public async Task<IActionResult> All(CancellationToken ct)
-        => View(await _service.GetAllAsync(ActorId, ct));
+    {
+        // [Authorize] pada controller tetap mewajibkan login.
+        // Gunakan sumber otorisasi yang sama dengan layout dan service.
+        var actorId = _currentUser.UserId;
+        if (!actorId.HasValue)
+            return StatusCode(StatusCodes.Status403Forbidden,
+                "Identitas pengguna lokal tidak tersedia. Silakan login kembali.");
+
+        var actor = await _users.GetByIdAsync(actorId.Value, ct);
+        if (actor is null || !actor.IsAuditor)
+            return StatusCode(StatusCodes.Status403Forbidden,
+                "Hanya Admin/Auditor yang dapat melihat semua request.");
+
+        // Service juga memverifikasi IsAuditor sebelum membaca seluruh request.
+        var requests = await _service.GetAllAsync(actorId.Value, ct);
+        return View("All", requests);
+    }
 
     // ------------------------------------------------------------------ DETAIL
 
@@ -100,14 +118,23 @@ public class RequestsController : Controller
 
             return await ReRenderCreateAsync(model, StatusCodes.Status400BadRequest, ct);
         }
+        catch (ConflictException ex)
+        {
+            _logger.LogWarning("Create conflict {Code} for user {ActorId}", ex.Code, ActorId);
+            return await ReRenderCreateAsync(model, StatusCodes.Status409Conflict, ct, ex.Code, ex.Message);
+        }
     }
 
-    private async Task<IActionResult> ReRenderCreateAsync(CreateRequestViewModel model, int statusCode, CancellationToken ct)
+    private async Task<IActionResult> ReRenderCreateAsync(
+        CreateRequestViewModel model, int statusCode, CancellationToken ct,
+        string? conflictCode = null, string? conflictMessage = null)
     {
         var actor = await _users.GetByIdAsync(ActorId, ct);
         model.Applications = await _masterData.ListApplicationsAsync(ct);
         model.CanCreate = actor?.ManagerId is not null;
         Response.StatusCode = statusCode;
+        ViewData["ConflictCode"] = conflictCode;
+        ViewData["ConflictMessage"] = conflictMessage;
         return View(model);
     }
 

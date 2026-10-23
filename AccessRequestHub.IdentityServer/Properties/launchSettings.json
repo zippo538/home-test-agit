@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "https": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "applicationUrl": "https://localhost:7149;http://localhost:5149",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ConnectionStrings__Identity": "Data Source=../accessrequesthub.identity.db;Default Timeout=30",
+        "ConnectionStrings__Hub": "Data Source=accessrequesthub.db;Default Timeout=30"
+      }
+    },
+    "http": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "applicationUrl": "http://localhost:5149",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ConnectionStrings__Identity": "Data Source=../accessrequesthub.identity.db;Default Timeout=30",
+        "ConnectionStrings__Hub": "Data Source=accessrequesthub.db;Default Timeout=30"
+      }
+    }
+  }
+}

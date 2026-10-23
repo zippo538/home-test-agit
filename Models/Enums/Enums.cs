@@ -1,4 +1,4 @@
-namespace home_test_agit.Models;
+namespace home_test_agit.Models.Enums;
 
 // Dinamai TargetEnvironment (bukan Environment) agar tidak bentrok dengan System.Environment.
 public enum TargetEnvironment
@@ -27,6 +27,11 @@ public enum AuditAction
     ManagerApproved,
     SystemOwnerApproved,
     Rejected
+}
+public enum ApproverRole
+{
+    Manager,
+    SystemOwner
 }
 
 public static class RequestStatusExtensions

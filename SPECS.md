@@ -64,7 +64,7 @@ Satu proyek web monolit dengan pemisahan folder (tanpa microservice):
 ```
 AccessRequestHub/
 ├─ src/AccessRequestHub.Web/
-│  ├─ Domain/          # entity, enum, RiskPolicy, WorkflowRules (murni, tanpa EF)
+│  ├─ Domain/          # entity, enum, PolicyVersion, WorkflowRules (murni, tanpa EF)
 │  ├─ Data/            # AppDbContext, Migrations, Seed, trigger SQL
 │  ├─ Services/        # AccessRequestService (create, approve, reject, query)
 │  ├─ Auth/            # DemoAuthHandler, CurrentUser
@@ -201,8 +201,8 @@ Seed memakai ID tetap lewat `HasData` supaya reproducible.
 ### 3.3 Domain rules
 
 ```csharp
-// Domain/RiskPolicy.cs
-public static bool IsHighRisk(Environment env, AccessLevel level)
+// Domain/PolicyVersion.cs
+public bool IsHighRisk(Environment env, AccessLevel level)
     => env == Environment.Production || level == AccessLevel.Admin;
 ```
 
@@ -375,11 +375,11 @@ Estimasi total sekitar 7,5 jam (di bawah batas 8 jam). Centang saat selesai; com
 
 ### T1. Domain, schema, seed (1,5 jam)
 - [ ] Enum dan entity: `User`, `Application`, `PolicyVersion`, `AccessRequest`, `AuditEvent`
-- [ ] `RiskPolicy.IsHighRisk` dan `WorkflowRules` (tabel transisi)
+- [ ] `PolicyVersion.IsHighRisk` dan `WorkflowRules` (tabel transisi)
 - [ ] `AppDbContext`: konfigurasi FK, UNIQUE, CHECK, index, konversi enum ke string
 - [ ] Migration awal + `migrationBuilder.Sql` untuk trigger audit
 - [ ] Seed users, applications, policy `v1`
-- [ ] Unit test `RiskPolicy` (4 kombinasi) dan `WorkflowRules` (tabel transisi)
+- [ ] Unit test `PolicyVersion` (4 kombinasi) dan `WorkflowRules` (tabel transisi)
 
 ### T2. Service layer (1,5 jam)
 - [ ] `CreateAsync`: validasi, requester dari user login, D-11, D-12, idempotency (D-05 sampai D-07)

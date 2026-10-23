@@ -1,4 +1,5 @@
 using home_test_agit.Models;
+using home_test_agit.Models.Enums;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -106,7 +107,8 @@ public class AccessRequestRepository : IAccessRequestRepository
     private IQueryable<AccessRequest> ListQuery()
         => _db.AccessRequests.AsNoTracking()
             .Include(r => r.Requester)
-            .Include(r => r.Application);
+            .Include(r => r.Application)
+            .Include(r => r.PolicyVersion);
 
     private static bool IsClientRequestIdViolation(DbUpdateException ex)
         => ex.InnerException is SqliteException

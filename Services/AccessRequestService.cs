@@ -1,6 +1,7 @@
+using home_test_agit.Domain;
 using home_test_agit.Models;
+using home_test_agit.Models.Enums;
 using home_test_agit.Repository;
-using Microsoft.Extensions.Logging;
 
 namespace home_test_agit.Services;
 
@@ -41,23 +42,23 @@ public class AccessRequestService : IAccessRequestService
 
         var errors = new Dictionary<string, string[]>();
         if (command.ClientRequestId == Guid.Empty)
-            errors[nameof(command.ClientRequestId)] = new[] { "ClientRequestId is required." };
+            errors[nameof(command.ClientRequestId)] = ["ClientRequestId is required."];
         if (!Enum.IsDefined(command.Environment))
-            errors[nameof(command.Environment)] = new[] { "Environment must be NonProduction or Production." };
+            errors[nameof(command.Environment)] = ["Environment must be NonProduction or Production."];
         if (!Enum.IsDefined(command.AccessLevel))
-            errors[nameof(command.AccessLevel)] = new[] { "AccessLevel must be Read or Admin." };
+            errors[nameof(command.AccessLevel)] = ["AccessLevel must be Read or Admin."];
 
         var justification = command.Justification?.Trim();
         if (string.IsNullOrEmpty(justification))
-            errors[nameof(command.Justification)] = new[] { "Justification is required." };
+            errors[nameof(command.Justification)] = ["Justification is required."];
         else if (justification.Length > MaxJustificationLength)
-            errors[nameof(command.Justification)] = new[] { $"Justification must be at most {MaxJustificationLength} characters." };
+            errors[nameof(command.Justification)] = [$"Justification must be at most {MaxJustificationLength} characters."];
 
         var application = await _masterData.GetApplicationAsync(command.ApplicationId, ct);
         if (application is null)
-            errors[nameof(command.ApplicationId)] = new[] { "Application is not valid." };
+            errors[nameof(command.ApplicationId)] = ["Application is not valid."];
         else if (application.SystemOwnerId == actor.Id)   // D-12
-            errors[nameof(command.ApplicationId)] = new[] { "You cannot request access to an application you own." };
+            errors[nameof(command.ApplicationId)] = ["You cannot request access to an application you own."];
 
         if (errors.Count > 0)
             throw new ValidationFailedException(errors);
@@ -213,7 +214,7 @@ public class AccessRequestService : IAccessRequestService
         var asManager = await _requests.ListPendingManagerAsync(actor.Id, ct);
         var asSystemOwner = await _requests.ListPendingSystemOwnerAsync(actor.Id, ct);
 
-        return asManager.Concat(asSystemOwner).OrderBy(r => r.CreatedAt).ToList();
+        return [.. asManager.Concat(asSystemOwner).OrderBy(r => r.CreatedAt)];
     }
 
     public async Task<List<AccessRequest>> GetAllAsync(int actorId, CancellationToken ct = default)

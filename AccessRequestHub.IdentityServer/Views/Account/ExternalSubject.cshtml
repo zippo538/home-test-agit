@@ -1,0 +1,34 @@
+@model AccessRequestHub.IdentityServer.Models.ExternalSubjectViewModel
+@{
+    ViewData["Title"] = "Sign in with Microsoft";
+}
+<div class="row justify-content-center py-5">
+    <div class="col-sm-10 col-md-7 col-lg-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4 p-md-5">
+                <h1 class="h4 mb-3">Sign in with Microsoft</h1>
+                <p class="text-secondary">
+                    Akun Microsoft ini belum terhubung ke pengguna Access Request Hub.
+                    Dalam mode <strong>Development</strong>, operator menautkan akun dengan
+                    menambahkan konfigurasi <code>Microsoft:ApprovedSubjects</code> berisi
+                    subject di bawah dan ID pengguna domain yang menjadi target (misalnya
+                    <code>1</code> untuk Alice, <code>2</code> untuk Bob, dst.), lalu
+                    memulai ulang IdentityServer. Tautan hanya terjadi bila operator
+                    menyetujui secara eksplisit; email tidak dipakai untuk mencocokkan.
+                </p>
+                <dl class="row mb-4">
+                    <dt class="col-sm-4">Microsoft email</dt>
+                    <dd class="col-sm-8"><code>@(Model.MicrosoftEmail ?? "(tidak tersedia)")</code></dd>
+                    <dt class="col-sm-4">Subject (sub)</dt>
+                    <dd class="col-sm-8"><code>@Model.Subject</code></dd>
+                </dl>
+                <p class="small text-secondary">Contoh perintah yang dijalankan operator:</p>
+                <pre class="bg-light border rounded p-3 small"><code>dotnet user-secrets set "Microsoft:ApprovedSubjects:@Model.Subject" "&lt;email-pengguna-domain&gt;" --project AccessRequestHub.IdentityServer</code></pre>
+                <p class="small text-secondary mt-3 mb-0">
+                    Setelah konfigurasi ditambahkan dan IdentityServer dijalankan ulang,
+                    coba lagi dari halaman login.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
