@@ -1,11 +1,11 @@
-using home_test_agit.Models;
-using home_test_agit.ViewModels;
+using AccessRequestHub.Models;
+using AccessRequestHub.Web.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace home_test_agit.Controllers;
+namespace AccessRequestHub.Web.Controllers;
 
 public sealed class AccountController : Controller
 {

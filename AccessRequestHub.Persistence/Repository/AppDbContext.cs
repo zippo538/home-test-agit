@@ -1,7 +1,7 @@
-using home_test_agit.Models;
+using AccessRequestHub.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace home_test_agit.Repository;
+namespace AccessRequestHub.Persistence.Repository;
 
 public class AppDbContext : DbContext
 {

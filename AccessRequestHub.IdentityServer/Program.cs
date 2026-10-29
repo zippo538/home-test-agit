@@ -1,8 +1,8 @@
 using AccessRequestHub.IdentityServer.Identity;
 using Duende.IdentityServer;
 using Duende.IdentityServer.Models;
-using home_test_agit.Data;
-using home_test_agit.Repository;
+using AccessRequestHub.Persistence.Data;
+using AccessRequestHub.Persistence.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;

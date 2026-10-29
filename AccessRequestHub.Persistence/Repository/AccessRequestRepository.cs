@@ -1,9 +1,9 @@
-using home_test_agit.Models;
-using home_test_agit.Models.Enums;
+using AccessRequestHub.Models;
+using AccessRequestHub.Models.Enums;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
-namespace home_test_agit.Repository;
+namespace AccessRequestHub.Persistence.Repository;
 
 public class AccessRequestRepository : IAccessRequestRepository
 {

@@ -3,7 +3,7 @@ using Duende.IdentityServer.AspNetIdentity;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Microsoft.AspNetCore.Identity;
-using home_test_agit.Repository;
+using AccessRequestHub.Persistence.Repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace AccessRequestHub.IdentityServer.Identity;

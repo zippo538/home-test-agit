@@ -1,13 +1,13 @@
-using home_test_agit.Auth;
-using home_test_agit.Filters;
-using home_test_agit.Repository;
+using AccessRequestHub.Web.Auth;
+using AccessRequestHub.Web.Filters;
+using AccessRequestHub.Persistence.Repository;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-namespace home_test_agit.Services;
+namespace AccessRequestHub.Web.Services;
 
 public static class ServiceCollectionExtensions
 {
