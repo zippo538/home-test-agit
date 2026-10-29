@@ -1,5 +1,5 @@
-using home_test_agit.Models;
-using home_test_agit.Models.Enums;
+using AccessRequestHub.Models;
+using AccessRequestHub.Models.Enums;
 
 namespace AccessRequestHub.Tests.Domain;
 

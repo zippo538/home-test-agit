@@ -1,0 +1,86 @@
+@using AccessRequestHub.Models.Enums
+@model AccessRequestHub.Web.ViewModels.CreateRequestViewModel
+@{
+    ViewData["Title"] = "Ajukan Request";
+}
+
+<h1 class="h4 mb-3">Ajukan Request Akses</h1>
+
+@if (ViewData["ConflictMessage"] is string conflictMessage)
+{
+    <div class="alert alert-warning" data-conflict-code="@ViewData["ConflictCode"]">@conflictMessage</div>
+}
+
+@if (!Model.CanCreate)
+{
+    <div class="alert alert-warning">@Model.Notice</div>
+    <a class="btn btn-outline-secondary btn-sm" asp-action="Index">Kembali</a>
+}
+else
+{
+<div class="row">
+    <div class="col-lg-7">
+        <form method="post" id="create-form" novalidate>
+            @Html.AntiForgeryToken()
+
+            @* Idempotency: dikirim apa adanya, jadi double submit tidak membuat request kedua (AC-05). *@
+            <input type="hidden" asp-for="ClientRequestId" />
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none-empty"></div>
+
+            <div class="mb-3">
+                <label asp-for="ApplicationId" class="form-label">Application</label>
+                <select asp-for="ApplicationId" class="form-select">
+                    <option value="">-- pilih aplikasi --</option>
+                    @foreach (var app in Model.Applications)
+                    {
+                        <option value="@app.Id">@app.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="ApplicationId" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Environment" class="form-label">Environment</label>
+                <select asp-for="Environment" class="form-select"
+                        asp-items="Html.GetEnumSelectList<TargetEnvironment>()"></select>
+                <span asp-validation-for="Environment" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="AccessLevel" class="form-label">Access Level</label>
+                <select asp-for="AccessLevel" class="form-select"
+                        asp-items="Html.GetEnumSelectList<AccessLevel>()"></select>
+                <span asp-validation-for="AccessLevel" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Justification" class="form-label">Justification</label>
+                <textarea asp-for="Justification" class="form-control" rows="4"
+                          placeholder="Jelaskan alasan kebutuhan akses ini."></textarea>
+                <span asp-validation-for="Justification" class="text-danger small"></span>
+            </div>
+
+            <div class="alert alert-info small">
+                Production atau Admin dianggap <strong>high-risk</strong> dan memerlukan
+                persetujuan System Owner setelah atasan Anda.
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="submit-btn">Kirim Request</button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Batal</a>
+        </form>
+    </div>
+</div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Cegah double submit: tombol dinonaktifkan setelah form dikirim.
+        document.getElementById('create-form').addEventListener('submit', function () {
+            var btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.textContent = 'Mengirim...';
+        });
+    </script>
+}
