@@ -1,0 +1,11 @@
+@{
+    ViewData["Title"] = "Error";
+    var statusCode = ViewData["StatusCode"] as int? ?? 500;
+    var message = ViewData["Message"] as string ?? "Terjadi kesalahan pada server.";
+}
+<h1 class="text-danger">@statusCode Error</h1>
+<p>@message</p>
+<div class="alert alert-secondary">
+    Detail teknis hanya dicatat di log (Production). Di Development, lihat output aplikasi.
+</div>
+<a class="btn btn-outline-secondary btn-sm" asp-controller="Requests" asp-action="Index">Kembali ke My Requests</a>

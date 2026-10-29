@@ -34,7 +34,7 @@ Dari root repository, restore, build, dan test:
 ```bash
 dotnet restore
 dotnet build
-dotnet test tests/AccessRequestHub.Tests/AccessRequestHub.Tests.csproj
+dotnet test AccessRequestHub.Tests/AccessRequestHub.Tests.csproj
 ```
 
 Authentication berjalan melalui dua host. Lihat bagian 9 untuk konfigurasi secrets. Jalankan
@@ -73,7 +73,7 @@ Data Source=accessrequesthub.db;Default Timeout=30
 Schema business diinisialisasi oleh IdentityServer saat startup. Untuk migration workflow secara manual, gunakan host project yang mengandung `AppDbContext`:
 
 ```bash
-cd AccessRequestHub.Persitence
+cd AccessRequestHub.Persistence
 dotnet ef database update
 ```
 
@@ -121,7 +121,7 @@ Seed memakai ID tetap (`HasData`), jadi reproducible:
 dotnet test
 ```
 
-Test suite berada di `tests/AccessRequestHub.Tests` dan mencakup workflow, otorisasi, concurrency, idempotency, audit, dan validasi.
+Test suite berada di `AccessRequestHub.Tests` dan mencakup workflow, otorisasi, concurrency, idempotency, audit, dan validasi.
 
 ---
 
@@ -259,8 +259,8 @@ root repository:
 ```bash
 dotnet user-secrets init --project AccessRequestHub.IdentityServer
 dotnet user-secrets set "Oidc:ClientSecret" "<strong-random-client-secret>" --project AccessRequestHub.IdentityServer
-dotnet user-secrets init --project home-test-agit.csproj
-dotnet user-secrets set "Oidc:ClientSecret" "<same-strong-random-client-secret>" --project home-test-agit.csproj
+dotnet user-secrets init --project AccessRequestHub.Web
+dotnet user-secrets set "Oidc:ClientSecret" "<same-strong-random-client-secret>" --project AccessRequestHub.Web
 ```
 
 Tambahkan password sementara yang unik untuk setiap akun demo ke user secrets IdentityServer
