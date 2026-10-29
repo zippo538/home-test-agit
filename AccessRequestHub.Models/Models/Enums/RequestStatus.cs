@@ -1,18 +1,5 @@
 namespace home_test_agit.Models.Enums;
 
-// Dinamai TargetEnvironment (bukan Environment) agar tidak bentrok dengan System.Environment.
-public enum TargetEnvironment
-{
-    NonProduction,
-    Production
-}
-
-public enum AccessLevel
-{
-    Read,
-    Admin
-}
-
 public enum RequestStatus
 {
     PendingManager,
@@ -21,22 +8,10 @@ public enum RequestStatus
     Rejected
 }
 
-public enum AuditAction
-{
-    Created,
-    ManagerApproved,
-    SystemOwnerApproved,
-    Rejected
-}
-public enum ApproverRole
-{
-    Manager,
-    SystemOwner
-}
-
 public static class RequestStatusExtensions
 {
     /// <summary>Approved dan Rejected adalah terminal (tidak boleh ada transisi lagi).</summary>
     public static bool IsTerminal(this RequestStatus status)
         => status is RequestStatus.Approved or RequestStatus.Rejected;
 }
+
