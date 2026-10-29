@@ -10,6 +10,7 @@ accessrequesthub.identity.db*
 .omc/
 .claude/
 accessrequesthub.db-*
+.data/
 
 bin/
 obj/
