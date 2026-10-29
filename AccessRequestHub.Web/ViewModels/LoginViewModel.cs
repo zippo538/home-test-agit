@@ -1,4 +1,4 @@
-namespace home_test_agit.ViewModels;
+namespace AccessRequestHub.Web.ViewModels;
 
 public sealed class LoginViewModel
 {

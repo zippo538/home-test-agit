@@ -45,7 +45,7 @@ dotnet run --project AccessRequestHub.IdentityServer --launch-profile https
 ```
 
 ```bash
-dotnet run --project home-test-agit.csproj --launch-profile https
+dotnet run --project AccessRequestHub.Web --launch-profile https
 ```
 
 Buka `https://localhost:7019`; login akan dialihkan ke Duende IdentityServer. Host HTTP lokal
@@ -60,7 +60,7 @@ IdentityServer memigrasikan schema workflow dan memasang trigger append-only pad
 
 ### Lokasi
 
-File business `accessrequesthub.db` berada di root project. Connection string ada di `appsettings.json`. Identity credentials disimpan terpisah di `accessrequesthub.identity.db` dan tidak berisi data workflow:
+File business `accessrequesthub.db` berada di root project. Connection string ada di `AccessRequestHub.Web/appsettings.json`. Identity credentials disimpan terpisah di `accessrequesthub.identity.db` dan tidak berisi data workflow:
 
 ```
 Data Source=accessrequesthub.db;Default Timeout=30
@@ -73,6 +73,7 @@ Data Source=accessrequesthub.db;Default Timeout=30
 Schema business diinisialisasi oleh IdentityServer saat startup. Untuk migration workflow secara manual, gunakan host project yang mengandung `AppDbContext`:
 
 ```bash
+cd AccessRequestHub.Persitence
 dotnet ef database update
 ```
 
@@ -80,6 +81,7 @@ dotnet ef database update
 
 ```bash
 # Hentikan aplikasi terlebih dahulu (file DB terkunci saat app berjalan)
+cd ../
 rm -f accessrequesthub.db accessrequesthub.db-shm accessrequesthub.db-wal
 dotnet run
 ```
@@ -125,13 +127,13 @@ Test suite berada di `tests/AccessRequestHub.Tests` dan mencakup workflow, otori
 
 ## 5. Demo users
 
-| Email | Nama | Peran |
-|---|---|---|
-| alice@example.local | Alice | Requester (atasan: Bob) |
-| bob@example.local | Bob | Manager Alice — approver tahap 1 |
-| carol@example.local | Carol | System Owner **CRM** — approver tahap 2 |
-| dana@example.local | Dana | System Owner **Finance Portal** — approver tahap 2 |
-| erin@example.local | Erin | Admin/Auditor — melihat semua request + audit, **bukan approver** |
+| Email | Nama | Password | Peran |
+|---|---|---| ---|
+| `alice@example.local` | Alice | `DemoAlice2026!` | Requester (atasan: Bob) |
+| `bob@example.local` | Bob | `DemoBob2026!Ab` | Manager Alice — approver tahap 1 |
+| `carol@example.local` | Carol | `DemoCarol2026!` |System Owner **CRM** — approver tahap 2 |
+| `dana@example.local` | Dana | `DemoDana2026!` |System Owner **Finance Portal** — approver tahap 2 |
+| `erin@example.local` | Erin | `DemoErin2026!` | Admin/Auditor — melihat semua request + audit, **bukan approver** |
 
 Akun domain di atas dipetakan ke akun ASP.NET Core Identity. Pada Development, IdentityServer hanya membuat akun yang password-nya diberikan lewat user secrets atau environment configuration (lihat bagian 9); password tidak disediakan secara default.
 
@@ -328,27 +330,14 @@ secure configuration. Patuhi persyaratan lisensi Duende.
 
 ---
 
-## 10. Struktur project
+## 10. Aspire
 
 ```
-Controllers/     Account (switcher), Requests (create/list/detail/approve/reject), Approvals (inbox)
-Auth/            DemoAuthenticationHandler, CurrentUser
-Filters/         DomainExceptionFilter (403/404 → halaman error)
-Models/          EF entities, PolicyVersion, enum, ViewModel
-Domain/          Pure business rules: WorkflowRules, ApprovalAuthorization
-Repository/      AppDbContext, repository + interface (semua query LINQ)
-Services/        AccessRequestService (aturan bisnis), exception domain, DI extension
-Data/            DatabaseBootstrapper (migrate + trigger audit append-only)
-Migrations/      Migration EF Core + seed
-Views/           Razor + Bootstrap (Requests, Approvals, Account, Shared)
-specs/           ACCEPTANCE, PLAN, SPEC, DECISIONS, TASKS
+dotnet restore AccessRequestHub.AppHost/AccessRequestHub.AppHost.csproj
+dotnet run --project AccessRequestHub.AppHost --launch-profile https
+
 ```
 
-Aturan bisnis terpusat di `Models/PolicyVersion.cs` (method `IsHighRisk`) dan
-`Domain/WorkflowRules.cs` (tabel transisi). Controller hanya membind request, memanggil service,
-dan memetakan hasil ke HTTP status.
-
----
 
 ## 11. Known limitations
 

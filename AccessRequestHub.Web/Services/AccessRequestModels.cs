@@ -1,7 +1,7 @@
-using home_test_agit.Models;
-using home_test_agit.Models.Enums;
+using AccessRequestHub.Models;
+using AccessRequestHub.Models.Enums;
 
-namespace home_test_agit.Services;
+namespace AccessRequestHub.Web.Services;
 
 public record CreateAccessRequestCommand(
     Guid ClientRequestId,

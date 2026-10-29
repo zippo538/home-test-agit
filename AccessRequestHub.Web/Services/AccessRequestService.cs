@@ -1,9 +1,10 @@
-using home_test_agit.Domain;
-using home_test_agit.Models;
-using home_test_agit.Models.Enums;
-using home_test_agit.Repository;
+using AccessRequestHub.Models.Domain;
+using AccessRequestHub.Models;
+using AccessRequestHub.Models.Enums;
+using AccessRequestHub.Persistence.Repository;
+using Microsoft.Extensions.Logging;
 
-namespace home_test_agit.Services;
+namespace AccessRequestHub.Web.Services;
 
 public class AccessRequestService : IAccessRequestService
 {

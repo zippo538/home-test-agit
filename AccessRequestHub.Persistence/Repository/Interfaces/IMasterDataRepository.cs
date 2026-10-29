@@ -1,6 +1,6 @@
-using home_test_agit.Models;
+using AccessRequestHub.Models;
 
-namespace home_test_agit.Repository;
+namespace AccessRequestHub.Persistence.Repository;
 
 public interface IMasterDataRepository
 {

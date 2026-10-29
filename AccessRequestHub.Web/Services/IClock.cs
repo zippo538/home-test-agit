@@ -1,4 +1,4 @@
-namespace home_test_agit.Services;
+namespace AccessRequestHub.Web.Services;
 
 public interface IClock
 {

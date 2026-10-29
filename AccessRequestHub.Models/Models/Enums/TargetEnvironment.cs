@@ -1,4 +1,4 @@
-namespace home_test_agit.Models.Enums;
+namespace AccessRequestHub.Models.Enums;
 
 public enum TargetEnvironment
 {

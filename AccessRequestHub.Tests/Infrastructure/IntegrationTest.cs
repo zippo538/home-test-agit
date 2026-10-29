@@ -1,6 +1,6 @@
-using home_test_agit.Models;
-using home_test_agit.Models.Enums;
-using home_test_agit.Repository;
+using AccessRequestHub.Models;
+using AccessRequestHub.Models.Enums;
+using AccessRequestHub.Persistence.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 

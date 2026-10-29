@@ -1,11 +1,11 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using home_test_agit.Models;
-using home_test_agit.Repository;
+using AccessRequestHub.Models;
+using AccessRequestHub.Persistence.Repository;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 
-namespace home_test_agit.Auth;
+namespace AccessRequestHub.Web.Auth;
 
 /// <summary>
 /// Auth simulasi (D-16). Sumber identitas:
