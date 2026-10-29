@@ -1,6 +1,6 @@
-using AccessRequestHub.Models.Enums;
+using home_test_agit.Models.Enums;
 
-namespace AccessRequestHub.Models;
+namespace home_test_agit.Models;
 
 public class AccessRequest
 {
@@ -72,7 +72,6 @@ public class AccessRequest
             throw new ArgumentException("Justification is required.", nameof(justification));
 
         return new AccessRequest
-        
         {
             Id = Guid.NewGuid(),
             ClientRequestId = clientRequestId,

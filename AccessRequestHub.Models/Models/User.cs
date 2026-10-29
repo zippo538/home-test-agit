@@ -1,4 +1,4 @@
-namespace AccessRequestHub.Models;
+namespace home_test_agit.Models;
 
 public class User
 {

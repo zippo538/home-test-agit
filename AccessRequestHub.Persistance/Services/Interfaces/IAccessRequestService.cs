@@ -1,6 +1,6 @@
-using AccessRequestHub.Models;
+using home_test_agit.Models;
 
-namespace AccessRequestHub.Web.Services;
+namespace home_test_agit.Services;
 
 public interface IAccessRequestService
 {

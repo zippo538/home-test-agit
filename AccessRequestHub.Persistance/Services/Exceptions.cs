@@ -1,4 +1,4 @@
-namespace AccessRequestHub.Web.Services;
+namespace home_test_agit.Services;
 
 /// <summary>400: input tidak valid. Errors berisi pesan per-field.</summary>
 public class ValidationFailedException : Exception

@@ -1,7 +1,7 @@
-using AccessRequestHub.Models;
-using AccessRequestHub.Models.Enums;
+using home_test_agit.Models;
+using home_test_agit.Models.Enums;
 
-namespace AccessRequestHub.Persistence.Repository;
+namespace home_test_agit.Repository;
 
 public interface IAccessRequestRepository
 {

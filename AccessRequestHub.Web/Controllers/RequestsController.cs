@@ -1,13 +1,13 @@
-using AccessRequestHub.Web.Auth;
-using AccessRequestHub.Models.Domain;
-using AccessRequestHub.Models;
-using AccessRequestHub.Persistence.Repository;
-using AccessRequestHub.Web.Services;
-using AccessRequestHub.Web.ViewModels;
+using home_test_agit.Auth;
+using home_test_agit.Domain;
+using home_test_agit.Models;
+using home_test_agit.Repository;
+using home_test_agit.Services;
+using home_test_agit.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AccessRequestHub.Web.Controllers;
+namespace home_test_agit.Controllers;
 
 [Authorize]
 public class RequestsController : Controller

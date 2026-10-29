@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using AccessRequestHub.Web.Services;
+using home_test_agit.Services;
 
-namespace AccessRequestHub.Web.Auth;
+namespace home_test_agit.Auth;
 
 public interface ICurrentUser
 {

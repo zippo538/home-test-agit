@@ -1,8 +1,5 @@
 <Solution>
-  <Project Path="AccessRequestHub.Models/AccessRequestHub.Models.csproj" />
-  <Project Path="AccessRequestHub.Persistence/AccessRequestHub.Persistence.csproj" />
-  <Project Path="AccessRequestHub.Web/AccessRequestHub.Web.csproj" />
   <Project Path="AccessRequestHub.IdentityServer/AccessRequestHub.IdentityServer.csproj" />
   <Project Path="AccessRequestHub.Tests/AccessRequestHub.Tests.csproj" />
-  <Project Path="AccessRequestHub.AppHost/AccessRequestHub.AppHost.csproj" />
+  <Project Path="home-test-agit.csproj" />
 </Solution>

@@ -2,25 +2,22 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using AccessRequestHub.Persistence.Repository;
+using home_test_agit.Repository;
 
 #nullable disable
 
-namespace AccessRequestHub.Persistence.Migrations
+namespace home_test_agit.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261016040634_InitialCreate")]
-    partial class InitialCreate
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.13");
 
-            modelBuilder.Entity("AccessRequestHub.Models.AccessRequest", b =>
+            modelBuilder.Entity("home_test_agit.Models.AccessRequest", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -103,7 +100,7 @@ namespace AccessRequestHub.Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("AccessRequestHub.Models.Application", b =>
+            modelBuilder.Entity("home_test_agit.Models.Application", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -141,7 +138,7 @@ namespace AccessRequestHub.Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("AccessRequestHub.Models.AuditEvent", b =>
+            modelBuilder.Entity("home_test_agit.Models.AuditEvent", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -194,7 +191,7 @@ namespace AccessRequestHub.Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("AccessRequestHub.Models.PolicyVersion", b =>
+            modelBuilder.Entity("home_test_agit.Models.PolicyVersion", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -224,7 +221,7 @@ namespace AccessRequestHub.Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("AccessRequestHub.Models.User", b =>
+            modelBuilder.Entity("home_test_agit.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -294,21 +291,21 @@ namespace AccessRequestHub.Persistence.Migrations
                         });
                 });
 
-            modelBuilder.Entity("AccessRequestHub.Models.AccessRequest", b =>
+            modelBuilder.Entity("home_test_agit.Models.AccessRequest", b =>
                 {
-                    b.HasOne("AccessRequestHub.Models.Application", "Application")
+                    b.HasOne("home_test_agit.Models.Application", "Application")
                         .WithMany()
                         .HasForeignKey("ApplicationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("AccessRequestHub.Models.PolicyVersion", "PolicyVersion")
+                    b.HasOne("home_test_agit.Models.PolicyVersion", "PolicyVersion")
                         .WithMany()
                         .HasForeignKey("PolicyVersionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("AccessRequestHub.Models.User", "Requester")
+                    b.HasOne("home_test_agit.Models.User", "Requester")
                         .WithMany()
                         .HasForeignKey("RequesterId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -321,9 +318,9 @@ namespace AccessRequestHub.Persistence.Migrations
                     b.Navigation("Requester");
                 });
 
-            modelBuilder.Entity("AccessRequestHub.Models.Application", b =>
+            modelBuilder.Entity("home_test_agit.Models.Application", b =>
                 {
-                    b.HasOne("AccessRequestHub.Models.User", "SystemOwner")
+                    b.HasOne("home_test_agit.Models.User", "SystemOwner")
                         .WithMany("OwnedApplications")
                         .HasForeignKey("SystemOwnerId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -332,15 +329,15 @@ namespace AccessRequestHub.Persistence.Migrations
                     b.Navigation("SystemOwner");
                 });
 
-            modelBuilder.Entity("AccessRequestHub.Models.AuditEvent", b =>
+            modelBuilder.Entity("home_test_agit.Models.AuditEvent", b =>
                 {
-                    b.HasOne("AccessRequestHub.Models.User", "Actor")
+                    b.HasOne("home_test_agit.Models.User", "Actor")
                         .WithMany()
                         .HasForeignKey("ActorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("AccessRequestHub.Models.AccessRequest", "Request")
+                    b.HasOne("home_test_agit.Models.AccessRequest", "Request")
                         .WithMany("AuditEvents")
                         .HasForeignKey("RequestId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -351,9 +348,9 @@ namespace AccessRequestHub.Persistence.Migrations
                     b.Navigation("Request");
                 });
 
-            modelBuilder.Entity("AccessRequestHub.Models.User", b =>
+            modelBuilder.Entity("home_test_agit.Models.User", b =>
                 {
-                    b.HasOne("AccessRequestHub.Models.User", "Manager")
+                    b.HasOne("home_test_agit.Models.User", "Manager")
                         .WithMany("DirectReports")
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -361,12 +358,12 @@ namespace AccessRequestHub.Persistence.Migrations
                     b.Navigation("Manager");
                 });
 
-            modelBuilder.Entity("AccessRequestHub.Models.AccessRequest", b =>
+            modelBuilder.Entity("home_test_agit.Models.AccessRequest", b =>
                 {
                     b.Navigation("AuditEvents");
                 });
 
-            modelBuilder.Entity("AccessRequestHub.Models.User", b =>
+            modelBuilder.Entity("home_test_agit.Models.User", b =>
                 {
                     b.Navigation("DirectReports");
 

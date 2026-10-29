@@ -1,4 +1,4 @@
-namespace AccessRequestHub.Models.Enums;
+namespace home_test_agit.Models.Enums;
 
 public enum AccessLevel
 {

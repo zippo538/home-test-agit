@@ -1,9 +1,7 @@
-using AccessRequestHub.Persistence.Repository;
+using home_test_agit.Repository;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
-namespace AccessRequestHub.Persistence.Data;
+namespace home_test_agit.Data;
 
 /// <summary>
 /// Membuat schema dan memasang proteksi append-only pada audit.

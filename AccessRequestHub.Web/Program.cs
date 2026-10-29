@@ -1,6 +1,5 @@
-using AccessRequestHub.Persistence.Data;
-using AccessRequestHub.Web.Services;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using home_test_agit.Data;
+using home_test_agit.Services;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,24 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAccessRequestHub(
     builder.Configuration.GetConnectionString("Default")!,
     builder.Configuration);
-
-// Hanya aktif saat dijalankan AppHost. Konfigurasi dijalankan sebelum
-// post-configuration OIDC membentuk discovery ConfigurationManager.
-var aspireAuthority = builder.Configuration["Aspire:IdentityAuthority"];
-if (!string.IsNullOrWhiteSpace(aspireAuthority))
-{
-    builder.Services.ConfigureAll<OpenIdConnectOptions>(options =>
-    {
-        options.Authority = aspireAuthority;
-        options.MetadataAddress = $"{aspireAuthority.TrimEnd('/')}/.well-known/openid-configuration";
-        options.ClientId = "accessrequesthub-web";
-        options.ClientSecret = builder.Configuration["Oidc:ClientSecret"]
-            ?? throw new InvalidOperationException("Oidc:ClientSecret is required.");
-        options.RequireHttpsMetadata = true;
-        options.CallbackPath = "/signin-oidc";
-        options.SignedOutCallbackPath = "/signout-callback-oidc";
-    });
-}
 
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)

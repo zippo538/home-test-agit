@@ -1,10 +1,10 @@
-using AccessRequestHub.Web.Auth;
-using AccessRequestHub.Models;
-using AccessRequestHub.Web.Services;
+using home_test_agit.Auth;
+using home_test_agit.Models;
+using home_test_agit.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AccessRequestHub.Web.Controllers;
+namespace home_test_agit.Controllers;
 
 [Authorize]
 public class ApprovalsController : Controller

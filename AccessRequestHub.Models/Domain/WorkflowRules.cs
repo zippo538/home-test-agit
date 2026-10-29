@@ -1,6 +1,6 @@
-using AccessRequestHub.Models.Enums;
+using home_test_agit.Models.Enums;
 
-namespace AccessRequestHub.Models.Domain;
+namespace home_test_agit.Domain;
 
 public readonly record struct Transition(AuditAction Action, RequestStatus To);
 

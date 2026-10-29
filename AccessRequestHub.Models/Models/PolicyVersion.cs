@@ -1,6 +1,6 @@
-using AccessRequestHub.Models.Enums;
+using home_test_agit.Models.Enums;
 
-namespace AccessRequestHub.Models;
+namespace home_test_agit.Models;
 
 public class PolicyVersion
 {

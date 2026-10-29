@@ -1,5 +1,5 @@
-@using AccessRequestHub.Models.Enums
-@model AccessRequestHub.Web.ViewModels.RequestDetailViewModel
+@using home_test_agit.Models.Enums
+@model home_test_agit.ViewModels.RequestDetailViewModel
 @{
     ViewData["Title"] = "Detail Request";
     var r = Model.Request;
@@ -134,8 +134,7 @@
                                     → @e.ToStatus
                                 </div>
                                 <div class="small text-muted">
-                                    @e.OccurredAt.ToString("yyyy-MM-dd HH:mm:ss") UTC · v@e.RequestVersion · policy
-                                    @e.PolicyVersionCode
+                                    @e.OccurredAt.ToString("yyyy-MM-dd HH:mm:ss") UTC · v@e.RequestVersion · policy @e.PolicyVersionCode
                                 </div>
                                 @if (!string.IsNullOrEmpty(e.Reason))
                                 {

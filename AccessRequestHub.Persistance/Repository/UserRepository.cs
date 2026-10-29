@@ -1,7 +1,7 @@
-using AccessRequestHub.Models;
+using home_test_agit.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace AccessRequestHub.Persistence.Repository;
+namespace home_test_agit.Repository;
 
 public class UserRepository : IUserRepository
 {

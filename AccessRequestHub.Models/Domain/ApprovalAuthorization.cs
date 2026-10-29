@@ -1,6 +1,7 @@
-using AccessRequestHub.Models.Enums;
+using home_test_agit.Models;
+using home_test_agit.Models.Enums;
 
-namespace AccessRequestHub.Models.Domain;
+namespace home_test_agit.Domain;
 
 /// <summary>
 /// Keputusan otorisasi approval (SPECS 3.3, D-13/D-14). Satu tempat, dipakai oleh
